@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## WYSIWYG Web Page Builder
 
-## Getting Started
+A simple drag-and-drop web page builder inspired by WordPress/Wix. Built with Next.js, React DnD, React RND, Tailwind CSS, and optional React Quill for rich text.
 
-First, run the development server:
+## Quick start
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Features (assignment coverage)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Canvas + sidebar toolbox (Text, Image, Button, Card, Video)
+- Drag to place, resize items; snap-to-grid; delete item
+- Edit text directly; rich text toolbar (bold/italic/underline, size, color, align)
+- Image upload or paste URL; button label/link/variant
+- Canvas background color picker
+- Design/Preview toggle
+- Dark mode toggle (persists) with html.dark and Tailwind dark variants
+- Export JSON and static HTML
 
-## Learn More
+## Notes
 
-To learn more about Next.js, take a look at the following resources:
+- If dark mode doesn’t flip immediately, refresh once. The app sets the html.dark class and CSS variables for background/foreground.
+- Video URLs (YouTube/Vimeo) are normalized to embed links.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deploy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Any static/Node host (Vercel, Netlify). For Vercel:
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run build
+npm start
+```

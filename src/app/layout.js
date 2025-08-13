@@ -22,6 +22,12 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var s=localStorage.getItem('modern-builder-v1');var d=true;if(s){var o=JSON.parse(s);if(Object.prototype.hasOwnProperty.call(o,'dark')){d=!!o.dark;}}var el=document.documentElement;el.classList.toggle('dark', !!d);}catch(e){}})();",
+          }}
+        />
         {children}
       </body>
     </html>
