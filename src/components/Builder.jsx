@@ -1330,7 +1330,7 @@ function generateHTML(items, opts = {}) {
             it.props.padding
           }px;font-size:${
             it.props.fontSize || 16
-          }px;white-space:pre-wrap;line-height:1.4;text-align:${
+          }px;white-space:pre-wrap;line-height:1.4;overflow:hidden;word-break:break-word;overflow-wrap:anywhere;hyphens:auto;text-align:${
             it.props.align || "left"
           };">${it.props.html}</div>`;
         case "image":
@@ -1403,7 +1403,7 @@ function generateHTML(items, opts = {}) {
     })
     .join("\n");
 
-  return `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Exported Page</title><style>*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;padding:0}body{background:${canvasBg};min-height:100vh;font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}/* minimal reset to match Tailwind preflight for text spacing */h1,h2,h3,h4,h5,h6,p{margin:0}img{display:block;max-width:100%;height:auto}a{color:inherit;text-decoration:none}#root{position:relative;width:${exportWidth}px;height:${exportHeight}px;background:${canvasBg};overflow:hidden;margin:40px auto}</style></head><body><div id="root">${blocks}</div></body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Exported Page</title><style>*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;padding:0}body{background:${canvasBg};min-height:100vh;font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}/* minimal reset to match Tailwind preflight for text spacing */h1,h2,h3,h4,h5,h6,p{margin:0}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}img{display:block;max-width:100%;height:auto}a{color:inherit;text-decoration:none}#root{position:relative;width:${exportWidth}px;height:${exportHeight}px;background:${canvasBg};overflow:hidden;margin:40px auto}</style></head><body><div id="root">${blocks}</div></body></html>`;
 }
 
 function inlineCommon(p) {
