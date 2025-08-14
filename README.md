@@ -1,8 +1,8 @@
 ## Modern WYSIWYG Website Builder
 
-A drag‑and‑drop canvas to compose simple web layouts, edit rich text, and export a single HTML file that matches the canvas.
+A simple web-based WYSIWYG (What You See Is What You Get) web page builder inspired by WordPress and Wix. The builder should allow users to create a basic web page layout by dragging and dropping components, editing text, and previewing the final layout.
 
-### Features
+## Features
 
 - Drag & drop blocks: Text, Image, Button, Card, Video
 - Move/resize with snap‑to‑grid and corner handles
@@ -13,7 +13,7 @@ A drag‑and‑drop canvas to compose simple web layouts, edit rich text, and ex
 - Export to HTML (self-contained styling) and JSON
 - Autosave to localStorage; Clear resets the canvas
 
-### Tech stack
+## Tech stack
 
 - Next.js 15 (App Router) + React 19
 - Tailwind CSS v4 (class-based dark mode)
@@ -22,21 +22,7 @@ A drag‑and‑drop canvas to compose simple web layouts, edit rich text, and ex
 - Lexical Editor (@lexical/react + nodes) for text editing and HTML in/out
 - lucide-react for icons
 
-### Project structure
-
-```
-src/
-	app/
-		page.js         # Renders the Builder
-		layout.js, globals.css
-	components/
-		Builder.jsx     # Main builder: canvas, toolbox, toolbar, export logic
-		RichTextEditor.jsx  # Lexical editor wrapper (HTML in/out, B/I/U)
-public/
-	...assets
-```
-
-### Quick start
+## Quick start
 
 Prerequisites: Node.js 18+
 
@@ -47,7 +33,7 @@ npm run dev
 
 Open http://localhost:3000.
 
-### How to use
+## How to use
 
 - Drag a component from the left toolbox onto the canvas
 - Select a block to move/resize; use the corner handles to resize
@@ -55,7 +41,7 @@ Open http://localhost:3000.
 - Use the floating toolbar to tweak props (radius, background, shadow, colors, etc.)
 - Top bar: Design/Preview, Grid toggle, Canvas background, Dark/Light, Export HTML/JSON, Clear
 
-### Export notes
+## Export notes
 
 - Exported HTML centers the canvas and sizes it to the furthest items
 - Minimal CSS reset included to avoid text spacing and heading defaults
@@ -63,12 +49,12 @@ Open http://localhost:3000.
 - Images: uploaded files are embedded as data URLs; external URLs referenced as-is
 - YouTube/Vimeo links normalized to embed URLs
 
-### Persistence
+## Persistence
 
 - Autosaves to localStorage under key: `modern-builder-v1`
 - “Clear” removes items and selection
 
-### Scripts
+## Scripts
 
 ```bash
 # Dev (Turbopack)
@@ -81,8 +67,18 @@ npm run build
 npm start
 ```
 
-### Known limits / ideas
+## Known limits / ideas
 
 - Text formatting limited to Bold/Italic/Underline
 - Absolute positioning by design; responsive behavior is manual
 - No groups/multi-select yet; no external webfont packaging in export
+
+## Demo
+
+Here’s a preview of Modern Website Builder:
+
+1. Website
+   ![website](public/Screenshots/website.png)
+
+2. Exported HTML Example
+   ![example](public/Screenshots/example.png)
