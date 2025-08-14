@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import RichTextEditor from "./RichTextEditor";
 import {
   Blocks,
   Image as ImageIcon,
@@ -385,6 +386,7 @@ function CanvasItem({
   mode,
 }) {
   const enableDragging = mode === "design";
+  const [textAPI, setTextAPI] = useState(null);
   return (
     <DraggableResizable
       x={item.x}
@@ -406,7 +408,10 @@ function CanvasItem({
         }`}
       >
         {item.type === "text" && (
-          <TextBlock {...{ item, updateItem, selected, mode }} />
+          <TextBlock
+            {...{ item, updateItem, selected, mode }}
+            registerTextAPI={setTextAPI}
+          />
         )}
         {item.type === "image" && <ImageBlock {...{ item, updateItem }} />}
         {item.type === "button" && (
@@ -420,6 +425,7 @@ function CanvasItem({
             item={item}
             updateItem={updateItem}
             onDelete={onDelete}
+            textAPI={textAPI}
           />
         )}
       </div>
@@ -572,7 +578,7 @@ function DraggableResizable({
 }
 
 // ---- Blocks ----
-function TextBlock({ item, updateItem, selected, mode }) {
+function TextBlock({ item, updateItem, selected, mode, registerTextAPI }) {
   const { html, color, align, fontSize, padding, radius, bg, shadow } =
     item.props;
   const isPreview = mode === "preview";
@@ -608,28 +614,16 @@ function TextBlock({ item, updateItem, selected, mode }) {
           dangerouslySetInnerHTML={{ __html: html }}
         />
       ) : (
-        <div
-          ref={ref}
-          className="editable outline-none cursor-text"
-          contentEditable
-          suppressContentEditableWarning
-          data-no-drag
-          dir="ltr"
-          style={{
-            fontSize,
-            textAlign: align || "left",
-            whiteSpace: "pre-wrap",
-            lineHeight: 1.4,
-          }}
-          onInput={(e) => {
-            // Read live DOM content; do not re-apply as innerHTML to preserve caret
-            const val = e.currentTarget.innerHTML;
-            updateItem({ props: { ...item.props, html: val } });
-          }}
-          onBlur={(e) => {
-            const val = e.currentTarget.innerHTML;
-            updateItem({ props: { ...item.props, html: val } });
-          }}
+        <RichTextEditor
+          initialHTML={html}
+          onHTMLChange={(val) =>
+            updateItem({ props: { ...item.props, html: val } })
+          }
+          className="editable cursor-text"
+          style={{ fontSize, textAlign: align || "left" }}
+          placeholder="Type here..."
+          showInlineToolbar={false}
+          registerAPI={registerTextAPI}
         />
       )}
     </div>
@@ -788,7 +782,7 @@ function Label({ children }) {
   );
 }
 
-function FloatingToolbar({ item, updateItem, onDelete }) {
+function FloatingToolbar({ item, updateItem, onDelete, textAPI }) {
   const common = item.props || {};
   const fileRef = useRef(null);
   const cardFileRef = useRef(null);
@@ -800,6 +794,7 @@ function FloatingToolbar({ item, updateItem, onDelete }) {
         <span className="px-1 text-[11px] text-zinc-600 dark:text-zinc-300">
           {item.type ? String(item.type).toUpperCase() : "ITEM"}
         </span>
+
         <span className="mx-1 h-4 w-px bg-zinc-200 dark:bg-zinc-700" />
         <button
           title="Delete"
@@ -809,6 +804,7 @@ function FloatingToolbar({ item, updateItem, onDelete }) {
           <Trash2 size={14} />
         </button>
         <span className="mx-1 h-4 w-px bg-zinc-200 dark:bg-zinc-700" />
+
         {/* Common controls */}
         <Label>Radius</Label>
         <input
@@ -821,6 +817,34 @@ function FloatingToolbar({ item, updateItem, onDelete }) {
             })
           }
         />
+        {item.type === "text" && textAPI ? (
+          <div className="ml-2 inline-flex items-center gap-1">
+            <button
+              title="Bold"
+              onClick={() => textAPI?.formatBold?.()}
+              className="rounded border border-zinc-200 px-2 py-0.5 font-semibold hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+              type="button"
+            >
+              B
+            </button>
+            <button
+              title="Italic"
+              onClick={() => textAPI?.formatItalic?.()}
+              className="rounded border border-zinc-200 px-2 py-0.5 italic hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+              type="button"
+            >
+              I
+            </button>
+            <button
+              title="Underline"
+              onClick={() => textAPI?.formatUnderline?.()}
+              className="rounded border border-zinc-200 px-2 py-0.5 underline hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+              type="button"
+            >
+              U
+            </button>
+          </div>
+        ) : null}
         {item.type !== "button" && (
           <>
             <Label>BG</Label>
@@ -855,7 +879,7 @@ function FloatingToolbar({ item, updateItem, onDelete }) {
                 updateItem({ props: { ...item.props, color: e.target.value } })
               }
             />
-            <button
+            {/* <button
               className="rounded border border-zinc-200 px-2 py-0.5 bg-white text-zinc-800 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
               onClick={() =>
                 document.execCommand && document.execCommand("bold")
@@ -872,7 +896,7 @@ function FloatingToolbar({ item, updateItem, onDelete }) {
               type="button"
             >
               I
-            </button>
+            </button> */}
             <Label>Size</Label>
             <input
               className="w-14 rounded border border-zinc-200 px-1 bg-white text-zinc-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"

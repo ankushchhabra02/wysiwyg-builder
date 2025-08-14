@@ -1,8 +1,44 @@
-## WYSIWYG Web Page Builder
+## Modern WYSIWYG Website Builder
 
-A simple drag-and-drop web page builder inspired by WordPress/Wix. Built with Next.js, React DnD, React RND, Tailwind CSS, and optional React Quill for rich text.
+A drag‑and‑drop canvas to compose simple web layouts, edit rich text, and export a single HTML file that matches the canvas.
 
-## Quick start
+### Features
+
+- Drag & drop blocks: Text, Image, Button, Card, Video
+- Move/resize with snap‑to‑grid and corner handles
+- Contextual floating toolbar (radius, color, shadow, etc.)
+- Rich text editing via Lexical with Bold / Italic / Underline
+- Canvas background color, grid overlay toggle, dark/light toggle
+- Preview mode (locked) vs Design mode (editable)
+- Export to HTML (self-contained styling) and JSON
+- Autosave to localStorage; Clear resets the canvas
+
+### Tech stack
+
+- Next.js 15 (App Router) + React 19
+- Tailwind CSS v4 (class-based dark mode)
+- react-dnd + HTML5 backend (drag & drop)
+- Custom draggable/resizable (React 19–safe) using pointer events
+- Lexical Editor (@lexical/react + nodes) for text editing and HTML in/out
+- lucide-react for icons
+
+### Project structure
+
+```
+src/
+	app/
+		page.js         # Renders the Builder
+		layout.js, globals.css
+	components/
+		Builder.jsx     # Main builder: canvas, toolbox, toolbar, export logic
+		RichTextEditor.jsx  # Lexical editor wrapper (HTML in/out, B/I/U)
+public/
+	...assets
+```
+
+### Quick start
+
+Prerequisites: Node.js 18+
 
 ```bash
 npm install
@@ -11,27 +47,42 @@ npm run dev
 
 Open http://localhost:3000.
 
-## Features (assignment coverage)
+### How to use
 
-- Canvas + sidebar toolbox (Text, Image, Button, Card, Video)
-- Drag to place, resize items; snap-to-grid; delete item
-- Edit text directly; rich text toolbar (bold/italic/underline, size, color, align)
-- Image upload or paste URL; button label/link/variant
-- Canvas background color picker
-- Design/Preview toggle
-- Dark mode toggle (persists) with html.dark and Tailwind dark variants
-- Export JSON and static HTML
+- Drag a component from the left toolbox onto the canvas
+- Select a block to move/resize; use the corner handles to resize
+- For Text blocks: double‑click to edit; use B / I / U in the floating toolbar above the item
+- Use the floating toolbar to tweak props (radius, background, shadow, colors, etc.)
+- Top bar: Design/Preview, Grid toggle, Canvas background, Dark/Light, Export HTML/JSON, Clear
 
-## Notes
+### Export notes
 
-- If dark mode doesn’t flip immediately, refresh once. The app sets the html.dark class and CSS variables for background/foreground.
-- Video URLs (YouTube/Vimeo) are normalized to embed links.
+- Exported HTML centers the canvas and sizes it to the furthest items
+- Minimal CSS reset included to avoid text spacing and heading defaults
+- Text preserves white-space and line-height for visual parity
+- Images: uploaded files are embedded as data URLs; external URLs referenced as-is
+- YouTube/Vimeo links normalized to embed URLs
 
-## Deploy
+### Persistence
 
-Any static/Node host (Vercel, Netlify). For Vercel:
+- Autosaves to localStorage under key: `modern-builder-v1`
+- “Clear” removes items and selection
+
+### Scripts
 
 ```bash
+# Dev (Turbopack)
+npm run dev
+
+# Production build
 npm run build
+
+# Start production server
 npm start
 ```
+
+### Known limits / ideas
+
+- Text formatting limited to Bold/Italic/Underline
+- Absolute positioning by design; responsive behavior is manual
+- No groups/multi-select yet; no external webfont packaging in export
