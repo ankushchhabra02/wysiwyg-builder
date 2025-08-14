@@ -409,8 +409,10 @@ function CanvasItem({
           <TextBlock {...{ item, updateItem, selected, mode }} />
         )}
         {item.type === "image" && <ImageBlock {...{ item, updateItem }} />}
-        {item.type === "button" && <ButtonBlock {...{ item, updateItem }} />}
-        {item.type === "card" && <CardBlock {...{ item, updateItem }} />}
+        {item.type === "button" && (
+          <ButtonBlock {...{ item, updateItem, mode }} />
+        )}
+        {item.type === "card" && <CardBlock {...{ item, updateItem, mode }} />}
         {item.type === "video" && <VideoBlock {...{ item, updateItem }} />}
 
         {selected && enableDragging && (
@@ -597,7 +599,12 @@ function TextBlock({ item, updateItem, selected, mode }) {
         <div
           data-no-drag
           className="cursor-text"
-          style={{ fontSize, textAlign: align }}
+          style={{
+            fontSize,
+            textAlign: align || "left",
+            whiteSpace: "pre-wrap",
+            lineHeight: 1.4,
+          }}
           dangerouslySetInnerHTML={{ __html: html }}
         />
       ) : (
@@ -607,7 +614,13 @@ function TextBlock({ item, updateItem, selected, mode }) {
           contentEditable
           suppressContentEditableWarning
           data-no-drag
-          style={{ fontSize, textAlign: align }}
+          dir="ltr"
+          style={{
+            fontSize,
+            textAlign: align || "left",
+            whiteSpace: "pre-wrap",
+            lineHeight: 1.4,
+          }}
           onInput={(e) => {
             // Read live DOM content; do not re-apply as innerHTML to preserve caret
             const val = e.currentTarget.innerHTML;
@@ -639,7 +652,7 @@ function ImageBlock({ item, updateItem }) {
   );
 }
 
-function ButtonBlock({ item, updateItem }) {
+function ButtonBlock({ item, updateItem, mode }) {
   const { label, href, variant, radius, paddingX, paddingY } = item.props;
   const base =
     "inline-flex h-full w-full items-center justify-center font-semibold transition";
@@ -651,7 +664,10 @@ function ButtonBlock({ item, updateItem }) {
   return (
     <a
       href={href}
-      onClick={(e) => e.preventDefault()}
+      onClick={(e) => {
+        // Allow clicking in preview; block navigation while designing
+        if (mode === "design") e.preventDefault();
+      }}
       className={cls}
       style={{
         borderRadius: radius,
@@ -660,13 +676,15 @@ function ButtonBlock({ item, updateItem }) {
         paddingTop: paddingY,
         paddingBottom: paddingY,
       }}
+      target={mode === "preview" ? "_blank" : undefined}
+      rel={mode === "preview" ? "noopener noreferrer" : undefined}
     >
       {label}
     </a>
   );
 }
 
-function CardBlock({ item, updateItem }) {
+function CardBlock({ item, updateItem, mode }) {
   const {
     title,
     body,
@@ -728,9 +746,13 @@ function CardBlock({ item, updateItem }) {
         <div className="mt-auto">
           <a
             href={href}
-            onClick={(e) => e.preventDefault()}
+            onClick={(e) => {
+              if (mode === "design") e.preventDefault();
+            }}
             className="mt-2 inline-flex items-center gap-2 text-sm font-semibold hover:underline"
             style={{ color: ctaColor }}
+            target={mode === "preview" ? "_blank" : undefined}
+            rel={mode === "preview" ? "noopener noreferrer" : undefined}
           >
             {cta}
           </a>
@@ -1306,7 +1328,9 @@ function generateHTML(items, opts = {}) {
         case "text":
           return `<div style="${style}${inlineCommon(it.props)}padding:${
             it.props.padding
-          }px;font-size:${it.props.fontSize || 16}px;text-align:${
+          }px;font-size:${
+            it.props.fontSize || 16
+          }px;white-space:pre-wrap;line-height:1.4;text-align:${
             it.props.align || "left"
           };">${it.props.html}</div>`;
         case "image":
@@ -1379,7 +1403,7 @@ function generateHTML(items, opts = {}) {
     })
     .join("\n");
 
-  return `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Exported Page</title><style>*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;padding:0}body{background:${canvasBg};min-height:100vh;font:14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}#root{position:relative;width:${exportWidth}px;height:${exportHeight}px;background:${canvasBg};overflow:hidden;margin:40px auto}</style></head><body><div id="root">${blocks}</div></body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Exported Page</title><style>*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;padding:0}body{background:${canvasBg};min-height:100vh;font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}/* minimal reset to match Tailwind preflight for text spacing */h1,h2,h3,h4,h5,h6,p{margin:0}img{display:block;max-width:100%;height:auto}a{color:inherit;text-decoration:none}#root{position:relative;width:${exportWidth}px;height:${exportHeight}px;background:${canvasBg};overflow:hidden;margin:40px auto}</style></head><body><div id="root">${blocks}</div></body></html>`;
 }
 
 function inlineCommon(p) {
