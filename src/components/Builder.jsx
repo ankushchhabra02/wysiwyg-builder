@@ -299,7 +299,7 @@ function Canvas({
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!client || !rect) return;
       const id = `it-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-      const x = snap(client.x - rect.left - 160); // sidebar width padding approx for nicer initial placement
+      const x = snap(client.x - rect.left);
       const y = snap(client.y - rect.top);
       const base = {
         id,
@@ -574,6 +574,20 @@ function TextBlock({ item, updateItem, selected, mode }) {
   const { html, color, align, fontSize, padding, radius, bg, shadow } =
     item.props;
   const isPreview = mode === "preview";
+  const ref = useRef(null);
+
+  // Initialize editor content only when entering edit mode or switching item
+  useEffect(() => {
+    if (!isPreview && selected && ref.current) {
+      // Only set if different to avoid caret jump
+      if (ref.current.innerHTML !== html) {
+        ref.current.innerHTML = html || "";
+      }
+      // Place caret at end on first focus if empty
+      // Avoid forcing selection on every render
+    }
+  }, [isPreview, selected, item.id]);
+
   return (
     <div
       className={`h-full w-full overflow-auto ${shadow ? "shadow-md" : ""}`}
@@ -588,17 +602,21 @@ function TextBlock({ item, updateItem, selected, mode }) {
         />
       ) : (
         <div
+          ref={ref}
           className="editable outline-none cursor-text"
           contentEditable
           suppressContentEditableWarning
           data-no-drag
           style={{ fontSize, textAlign: align }}
-          dangerouslySetInnerHTML={{ __html: html }}
-          onInput={(e) =>
-            updateItem({
-              props: { ...item.props, html: e.currentTarget.innerHTML },
-            })
-          }
+          onInput={(e) => {
+            // Read live DOM content; do not re-apply as innerHTML to preserve caret
+            const val = e.currentTarget.innerHTML;
+            updateItem({ props: { ...item.props, html: val } });
+          }}
+          onBlur={(e) => {
+            const val = e.currentTarget.innerHTML;
+            updateItem({ props: { ...item.props, html: val } });
+          }}
         />
       )}
     </div>
@@ -1094,6 +1112,22 @@ function FloatingToolbar({ item, updateItem, onDelete }) {
                   props: { ...item.props, ctaColor: e.target.value },
                 })
               }
+            />
+            <input
+              className="w-36 rounded border border-zinc-200 px-2 py-0.5 bg-white text-zinc-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              value={common.cta || ""}
+              onChange={(e) =>
+                updateItem({ props: { ...item.props, cta: e.target.value } })
+              }
+              placeholder="CTA text"
+            />
+            <input
+              className="w-48 rounded border border-zinc-200 px-2 py-0.5 bg-white text-zinc-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              value={common.href || ""}
+              onChange={(e) =>
+                updateItem({ props: { ...item.props, href: e.target.value } })
+              }
+              placeholder="CTA link (https://...)"
             />
             <input
               className="w-40 rounded border border-zinc-200 px-2 py-0.5 bg-white text-zinc-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
